@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -18,6 +19,8 @@ func LoadMedia(
 	client *http.Client,
 	media *Media,
 	storyPath string,
+	idx int,
+	totalCount int,
 ) error {
 	extension, err := extensionByContentType(media.ContentType)
 	if err != nil {
@@ -43,7 +46,8 @@ func LoadMedia(
 		}
 	}(resp.Body)
 
-	path := filepath.Join(storyPath, fmt.Sprintf("%s%s", media.ID, extension))
+	padding := int(math.Max(math.Log10(float64(totalCount)), 2))
+	path := filepath.Join(storyPath, fmt.Sprintf("%0*d - %s%s", padding, idx, media.ID, extension))
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return xerrors.Errorf("failed to open file: %w", err)

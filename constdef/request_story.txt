@@ -1,4 +1,4 @@
-GET /api/v3/stories/91544964?comments_count=10&show_approval_permissions=true HTTP/1.1
+GET /api/v3/stories/94928721?comments_count=10&show_approval_permissions=true HTTP/1.1
 Accept: application/json
 Accept-Encoding: gzip, deflate, br, zstd
 Accept-Language: en-GB,en-US;q=0.9,en;q=0.8,ru;q=0.7
@@ -7,15 +7,14 @@ Content-Type: application/json
 Cookie:
 DNT: 1
 Host: app.storypark.com
-If-None-Match: W/"d798e490ac00c4f14998fca5a1cce0d3"
-Referer: https://app.storypark.com/stories/91544964/spa_show?back=https%3A%2F%2Fapp.storypark.com%2Factivity%3F
+Referer: https://app.storypark.com/stories/94928721/spa_show?back=https%3A%2F%2Fapp.storypark.com%2Factivity
 Sec-Fetch-Dest: empty
 Sec-Fetch-Mode: cors
 Sec-Fetch-Site: same-origin
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
 X-CSRF-Token:
 X-Requested-With: XMLHttpRequest
-X-Spa-Session-Id: 0c2027p
-sec-ch-ua: "Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"
+X-Spa-Session-Id: het0xnp
+sec-ch-ua: "Google Chrome";v="135", "Not-A.Brand";v="8", "Chromium";v="135"
 sec-ch-ua-mobile: ?0
 sec-ch-ua-platform: "macOS"
