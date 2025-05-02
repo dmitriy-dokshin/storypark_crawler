@@ -9,8 +9,14 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"syscall"
+	"time"
 
 	"golang.org/x/xerrors"
+)
+
+var (
+	ErrMediaForbidden = xerrors.New("media forbidden")
 )
 
 func LoadMedia(
@@ -37,6 +43,9 @@ func LoadMedia(
 		return xerrors.Errorf("failed to get original url: %w", err)
 	}
 	if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusForbidden {
+			return ErrMediaForbidden
+		}
 		return xerrors.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 	defer func(body io.ReadCloser) {
@@ -58,6 +67,30 @@ func LoadMedia(
 			logger.ErrorContext(ctx, "failed to close file", "error", err)
 		}
 	}(file)
+
+	if media.CreatedAt == "" {
+		return xerrors.Errorf("media created at is empty")
+	}
+	createdAt, err := time.Parse(time.RFC3339, media.CreatedAt)
+	if err != nil {
+		return xerrors.Errorf("failed to parse media created at: %w", err)
+	}
+
+	if media.UpdatedAt == "" {
+		return xerrors.Errorf("media updated at is empty")
+	}
+	updatedAt, err := time.Parse(time.RFC3339, media.UpdatedAt)
+	if err != nil {
+		return xerrors.Errorf("failed to parse media updated at: %w", err)
+	}
+
+	h := syscall.Handle(file.Fd())
+	createdAtFiletime := syscall.NsecToFiletime(createdAt.UnixNano())
+	updatedAtFiletime := syscall.NsecToFiletime(updatedAt.UnixNano())
+	err = syscall.SetFileTime(h, &createdAtFiletime, nil, &updatedAtFiletime)
+	if err != nil {
+		return xerrors.Errorf("failed to set file time: %w", err)
+	}
 
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"runtime"
 	"strings"
 
 	"golang.org/x/xerrors"
@@ -15,10 +16,17 @@ type THeader struct {
 	Value string
 }
 
+func newLine() string {
+	if runtime.GOOS == "windows" {
+		return "\r\n"
+	}
+	return "\n"
+}
+
 func ParseRequest(ctx context.Context, reqStr string, body io.Reader) (*http.Request, error) {
 	var method, host, path string
 	var headers []*THeader
-	lines := strings.Split(reqStr, "\n")
+	lines := strings.Split(reqStr, newLine())
 	parts := strings.Split(lines[0], " ")
 	if len(parts) != 3 {
 		return nil, xerrors.Errorf("invalid first request line: %s", lines[0])

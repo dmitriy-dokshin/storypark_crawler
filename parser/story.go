@@ -75,6 +75,7 @@ type ContentType string
 const (
 	ContentTypeVerticalLayout   ContentType = "vertical_layout"
 	ContentTypeHorizontalLayout ContentType = "horizontal_layout"
+	ContentTypeMediaGroup       ContentType = "media_group"
 	ContentTypeTitle            ContentType = "title"
 	ContentTypeText             ContentType = "text"
 	ContentTypeMedia            ContentType = "media"
@@ -84,6 +85,7 @@ type Content struct {
 	Type             ContentType              `json:"type"`
 	VerticalLayout   *ContentVerticalLayout   `json:"vertical_layout"`
 	HorizontalLayout *ContentHorizontalLayout `json:"horizontal_layout"`
+	MediaGroup       *ContentMediaGroup       `json:"media_group"`
 	Title            *ContentTitle            `json:"title"`
 	Text             *ContentText             `json:"text"`
 	Media            *ContentMedia            `json:"media"`
@@ -94,6 +96,10 @@ type ContentVerticalLayout struct {
 }
 
 type ContentHorizontalLayout struct {
+	Blocks []*Content `json:"blocks"`
+}
+
+type ContentMediaGroup struct {
 	Blocks []*Content `json:"blocks"`
 }
 
@@ -123,12 +129,22 @@ func (c *Content) GetInfo(info *ContentInfo) error {
 		}
 	case ContentTypeHorizontalLayout:
 		if c.HorizontalLayout == nil {
-			return xerrors.New("content has no vertical layout")
+			return xerrors.New("content has no horizontal layout")
 		}
 		for i, b := range c.HorizontalLayout.Blocks {
 			err := b.GetInfo(info)
 			if err != nil {
-				return xerrors.Errorf("failed to get info for vertical block %d: %w", i, err)
+				return xerrors.Errorf("failed to get info for horizontal block %d: %w", i, err)
+			}
+		}
+	case ContentTypeMediaGroup:
+		if c.MediaGroup == nil {
+			return xerrors.New("content has no media group")
+		}
+		for i, b := range c.MediaGroup.Blocks {
+			err := b.GetInfo(info)
+			if err != nil {
+				return xerrors.Errorf("failed to get info for media group block %d: %w", i, err)
 			}
 		}
 	case ContentTypeTitle:
@@ -173,6 +189,8 @@ type Media struct {
 	ContentType string `json:"content_type"`
 	OriginalUrl string `json:"original_url"`
 	ResizedUrl  string `json:"resized_url"`
+	CreatedAt   string `json:"created_at"`
+	UpdatedAt   string `json:"updated_at"`
 }
 
 type StoryResponse struct {
